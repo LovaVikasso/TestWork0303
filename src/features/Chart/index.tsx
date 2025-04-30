@@ -16,18 +16,24 @@ export const Chart = ({ data, width = 300, height = 100 }: Props) => {
   const tempRange = maxTemp - minTemp;
 
   // Отступы для графика
-  const padding = 15;
-  const graphWidth = width - padding * 2;
-  const graphHeight = height - padding * 2;
+  const padding = {
+    top: 5,
+    right: 15,
+    bottom: 2,
+    left: 15,
+  };
+  const graphWidth = width - (padding.left + padding.right);
+  const graphHeight = height - (padding.top + padding.bottom);
 
   // Создаем точки для линии графика
   const points = data
     .map((item, index) => {
-      const x = padding + index * (graphWidth / (data.length - 1));
+      const x = padding.left + index * (graphWidth / (data.length - 1));
       // Инвертируем Y координату, так как в SVG 0 находится сверху
       const y =
         height -
-        (padding + ((item.main.temp - minTemp) / tempRange) * graphHeight);
+        (padding.bottom +
+          ((item.main.temp - minTemp) / tempRange) * graphHeight);
       return `${x},${y}`;
     })
     .join(' ');
@@ -45,10 +51,11 @@ export const Chart = ({ data, width = 300, height = 100 }: Props) => {
 
         {/* Точки и значения температуры */}
         {data.map((item, index) => {
-          const x = padding + index * (graphWidth / (data.length - 1));
+          const x = padding.left + index * (graphWidth / (data.length - 1));
           const y =
             height -
-            (padding + ((item.main.temp - minTemp) / tempRange) * graphHeight);
+            (padding.bottom +
+              ((item.main.temp - minTemp) / tempRange) * graphHeight);
           const date = new Date(item.dt_txt).toLocaleDateString('en-US', {
             weekday: 'short',
           });
@@ -60,7 +67,7 @@ export const Chart = ({ data, width = 300, height = 100 }: Props) => {
               {/* Температура */}
               <text
                 x={x}
-                y={y - 8}
+                y={y - 5}
                 textAnchor="middle"
                 fontSize="10"
                 fill="#000"
@@ -70,7 +77,7 @@ export const Chart = ({ data, width = 300, height = 100 }: Props) => {
               {/* День недели */}
               <text
                 x={x}
-                y={height - 3}
+                y={height - 2}
                 textAnchor="middle"
                 fontSize="10"
                 fill="#666"

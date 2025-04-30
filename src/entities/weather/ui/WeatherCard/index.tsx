@@ -4,6 +4,7 @@ import { FavoriteButton } from '@/shared/ui/FavoriteButton';
 import { formatTime } from '@/shared/lib/formatTime';
 import { Typography } from '@/shared/ui/Typography';
 import { TemperatureUnit } from '@/entities/weather/model/store';
+import {getTemperatureSymbol} from "@/shared/lib/getTempretureSymbol";
 
 type Props = {
   weather: Weather;
@@ -11,9 +12,9 @@ type Props = {
 };
 
 export const WeatherCard = ({ weather, temperatureUnit }: Props) => {
-  const getTemperatureSymbol = () => (temperatureUnit === 'C' ? '°C' : '°F');
+
   return (
-    <div className="card mb-4">
+    <div className="card mb-4 h-100">
       <div className="card-body">
         <div className="d-flex justify-content-between align-items-center">
           <Typography as="h3" className="card-title mb-0">
@@ -29,7 +30,7 @@ export const WeatherCard = ({ weather, temperatureUnit }: Props) => {
           <div>
             <Typography as="h3" className="mb-0">
               {Math.round(weather.main.temp)}
-              {getTemperatureSymbol()}
+              {getTemperatureSymbol(temperatureUnit)}
             </Typography>
             <Typography className="text-capitalize mb-0">
               {weather.weather[0].description}
@@ -40,7 +41,7 @@ export const WeatherCard = ({ weather, temperatureUnit }: Props) => {
           <div className="col-6">
             <Typography>
               Feels like: {Math.round(weather.main.feels_like)}
-              {getTemperatureSymbol()}
+              {getTemperatureSymbol(temperatureUnit)}
             </Typography>
             <Typography>Humidity: {weather.main.humidity}%</Typography>
             <Typography>Visibility: {weather.visibility / 1000} km</Typography>

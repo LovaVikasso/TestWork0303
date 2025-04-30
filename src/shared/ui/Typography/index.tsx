@@ -30,7 +30,7 @@ type Variant =
 
 type Weight = 'fw-normal' | 'fw-bold' | 'fw-bolder' | 'fw-light' | 'fw-lighter';
 
-interface TypographyProps {
+type Props = {
   variant?: Variant;
   weight?: Weight;
   className?: string;
@@ -44,7 +44,7 @@ export const Typography = ({
   className = '',
   children,
   as: Component = 'p',
-}: TypographyProps) => {
+}: Props) => {
   const classes = [variant, weight, className].filter(Boolean).join(' ');
 
   return <Component className={classes}>{children}</Component>;

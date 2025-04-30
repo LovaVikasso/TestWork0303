@@ -9,6 +9,7 @@ export type CityWeather = {
   country: string;
   temperature: number;
   description: string;
+  icon: string;
 };
 
 export type WeatherStore = {
@@ -16,11 +17,13 @@ export type WeatherStore = {
   searchResults: CityWeather[];
   isLoading: boolean;
   searchCity: string;
+  currentCity: string;
   temperatureUnit: TemperatureUnit;
   temperatureOptions: { value: TemperatureUnit; label: string }[];
   currentWeather: Weather | null;
   forecast: WeatherForecastItem[];
   error: string | null;
+  searchFormError: string | null;
   addFavorite: (city: CityWeather) => void;
   removeFavorite: (cityName: string) => void;
   setSearchResults: (results: CityWeather[]) => void;
@@ -28,41 +31,61 @@ export type WeatherStore = {
   setLoading: (loading: boolean) => void;
   isFavorite: (cityName: string) => boolean;
   setSearchCity: (city: string) => void;
+  setCurrentCity: (city: string) => void;
   setTemperatureUnit: (unit: TemperatureUnit) => void;
   searchWeather: (city: string) => Promise<void>;
   fetchCityWeather: (city: string) => Promise<void>;
   setError: (error: string | null) => void;
+  setSearchFormError: (error: string | null) => void;
+  updateFavoriteWeather: (city: string) => Promise<void>;
 };
 
 const defaultCities: CityWeather[] = [
   {
-    name: 'Москва',
-    country: 'Россия',
+    name: 'Madagascar',
+    country: 'MG',
+    temperature: 25,
+    description: 'Sunny',
+    icon: '',
+  },
+  {
+    name: 'Moscow',
+    country: 'RU',
     temperature: 20,
-    description: 'Солнечно',
+    description: 'Cloudy',
+    icon: '',
   },
   {
-    name: 'Санкт-Петербург',
-    country: 'Россия',
-    temperature: 18,
-    description: 'Облачно',
-  },
-  {
-    name: 'Новосибирск',
-    country: 'Россия',
+    name: 'London',
+    country: 'GB',
     temperature: 15,
-    description: 'Пасмурно',
+    description: 'Rainy',
+    icon: '',
   },
 ];
 
 const getUnits = (unit: TemperatureUnit) =>
   unit === 'C' ? 'metric' : 'imperial';
 
+const STORAGE_KEY = 'favorite_cities';
+
+const loadFavorites = (): CityWeather[] => {
+  if (typeof window === 'undefined') return defaultCities;
+  const stored = localStorage.getItem(STORAGE_KEY);
+  return stored ? JSON.parse(stored) : defaultCities;
+};
+
+const saveFavorites = (favorites: CityWeather[]) => {
+  if (typeof window === 'undefined') return;
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(favorites));
+};
+
 export const useWeatherStore = create<WeatherStore>((set, get) => ({
-  favoriteCities: defaultCities,
+  favoriteCities: loadFavorites(),
   searchResults: [],
   isLoading: false,
   searchCity: '',
+  currentCity: loadFavorites()[0]?.name || 'Madagascar',
   temperatureUnit: 'C',
   temperatureOptions: [
     { value: 'C', label: '°C (Celsius)' },
@@ -71,18 +94,25 @@ export const useWeatherStore = create<WeatherStore>((set, get) => ({
   currentWeather: null,
   forecast: [],
   error: null,
+  searchFormError: null,
   addFavorite: (city) => {
     const exists = get().favoriteCities.some((c) => c.name === city.name);
     if (!exists) {
-      set((state) => ({
-        favoriteCities: [...state.favoriteCities, city],
-      }));
+      if (get().favoriteCities.length >= 5) {
+        set({ error: 'You can only have 5 favorite cities' });
+        return;
+      }
+      const newFavorites = [...get().favoriteCities, city];
+      set({ favoriteCities: newFavorites });
+      saveFavorites(newFavorites);
     }
   },
   removeFavorite: (cityName) => {
-    set((state) => ({
-      favoriteCities: state.favoriteCities.filter((c) => c.name !== cityName),
-    }));
+    const newFavorites = get().favoriteCities.filter(
+      (c) => c.name !== cityName
+    );
+    set({ favoriteCities: newFavorites });
+    saveFavorites(newFavorites);
   },
   setSearchResults: (results) => set({ searchResults: results }),
   clearSearchResults: () => set({ searchResults: [] }),
@@ -90,6 +120,7 @@ export const useWeatherStore = create<WeatherStore>((set, get) => ({
   isFavorite: (cityName) =>
     get().favoriteCities.some((city) => city.name === cityName),
   setSearchCity: (city) => set({ searchCity: city }),
+  setCurrentCity: (city) => set({ currentCity: city }),
   setTemperatureUnit: (unit) => {
     set({ temperatureUnit: unit });
     // Если есть текущий город, перезагружаем данные
@@ -99,6 +130,7 @@ export const useWeatherStore = create<WeatherStore>((set, get) => ({
     }
   },
   setError: (error) => set({ error }),
+  setSearchFormError: (error) => set({ searchFormError: error }),
   searchWeather: async (city) => {
     try {
       set({ isLoading: true });
@@ -109,6 +141,7 @@ export const useWeatherStore = create<WeatherStore>((set, get) => ({
         country: data.sys.country,
         temperature: data.main.temp,
         description: data.weather[0].description,
+        icon: data.weather[0].icon,
       };
       set({ searchResults: [cityWeather] });
     } catch (error) {
@@ -126,12 +159,62 @@ export const useWeatherStore = create<WeatherStore>((set, get) => ({
         fetchWeatherByCity(city, units),
         fetchWeatherDetails(city, units),
       ]);
-      set({ currentWeather: weatherData, forecast: forecastData.list });
+
+      // Обновляем данные в избранных городах, если город там есть
+      set((state) => {
+        const updatedFavorites = state.favoriteCities.map((favorite) => {
+          if (favorite.name === city) {
+            return {
+              ...favorite,
+              temperature: weatherData.main.temp,
+              description: weatherData.weather[0].description,
+              icon: weatherData.weather[0].icon,
+            };
+          }
+          return favorite;
+        });
+
+        return {
+          currentWeather: weatherData,
+          forecast: forecastData.list,
+          favoriteCities: updatedFavorites,
+        };
+      });
     } catch (err) {
       console.error('Error fetching weather data:', err);
       set({ error: 'Failed to fetch weather data' });
     } finally {
       set({ isLoading: false });
+    }
+  },
+  updateFavoriteWeather: async (city: string) => {
+    try {
+      const units = getUnits(get().temperatureUnit);
+      const weatherData = await fetchWeatherByCity(city, units);
+
+      set((state) => {
+        const updatedFavorites = state.favoriteCities.map((favorite) => {
+          if (favorite.name === city) {
+            return {
+              ...favorite,
+              temperature: weatherData.main.temp,
+              description: weatherData.weather[0].description,
+              icon: weatherData.weather[0].icon,
+            };
+          }
+          return favorite;
+        });
+
+        // Сохраняем обновленные данные в localStorage
+        saveFavorites(updatedFavorites);
+
+        return {
+          favoriteCities: updatedFavorites,
+        };
+      });
+    } catch (err) {
+      console.error('Error updating favorite weather:', err);
+      set({ error: 'Failed to update weather data' });
     }
   },
 }));

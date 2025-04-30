@@ -1,41 +1,115 @@
-<<<<<<< HEAD
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Weather Application
+
+A test weather application built with Next.js and TypeScript that allows users to check current weather conditions and forecasts for any city worldwide.
+
+## Features
+
+- 🌍 Search weather for any city
+- 🌡️ Temperature unit switching (Celsius/Fahrenheit)
+- ⭐ Save favorite cities
+- 📊 Detailed weather forecasts
+
+## Tech Stack
+
+- **Framework:** [Next.js](https://nextjs.org/)
+- **Language:** [TypeScript](https://www.typescriptlang.org/)
+- **Styling:**
+  - [SCSS Modules](https://nextjs.org/docs/basic-features/built-in-css-support#adding-component-level-css)
+  - [Bootstrap 5](https://getbootstrap.com/)
+  - [Bootstrap Icons](https://icons.getbootstrap.com/)
+- **State Management:** [Zustand](https://github.com/pmndrs/zustand)
+- **API:** [OpenWeatherMap API](https://openweathermap.org/api)
+- **Fonts:** [Geist](https://vercel.com/font)
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 18.0 or later
+- npm or yarn
+
+### Installation
+
+1. Clone the repository:
+
+```bash
+git clone [your-repository-url]
+cd [your-project-name]
+```
+
+2. Install dependencies:
+
+```bash
+npm install
+# or
+yarn install
+```
+
+
+3. Run the development server:
 
 ```bash
 npm run dev
 # or
 yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Project Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+src/
+├── app/                 # Next.js app directory
+├── entities/            # Business logic entities
+├── features/            # Feature-specific components
+├── shared/              # Shared components and utilities
+│   ├── api/            # API configuration and endpoints
+│   ├── lib/            # Utility functions
+│   ├── ui/             # Reusable UI components
+│   └── types/          # TypeScript type definitions
+```
 
-## Learn More
+## Key Features Implementation
 
-To learn more about Next.js, take a look at the following resources:
+### Weather Data Management
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- Uses OpenWeatherMap API for real-time weather data
+- Implements caching for better performance
+- Handles API errors gracefully with toast notifications
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### State Management
 
-## Deploy on Vercel
+- Zustand store for managing:
+  - Search results
+  - Favorite cities
+  - Temperature unit preferences
+  - Current weather data
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### UI/UX Features
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-=======
-# TestWork0303
-test assignment
->>>>>>> 0cb9d3e3994c7bd5ee998c4a64b5e01280ee00d2
+- Responsive design using Bootstrap grid system
+- Loading states and error handling
+- Intuitive navigation
+- Temperature unit switching
+
+## Deployment
+
+The application can be easily deployed on [Vercel](https://vercel.com/):
+
+1. Push your code to a Git repository
+2. Import the project to Vercel
+3. Add your environment variables
+4. Deploy!
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
