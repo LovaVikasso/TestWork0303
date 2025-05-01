@@ -1,13 +1,12 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import Link from 'next/link';
-import { useWeatherStore } from '@/entities/weather/model/store';
+import { loadFavorites, useWeatherStore } from '@/entities/weather/model/store';
 import { PageHeader } from '@/shared/ui/PageHeader';
-import { Typography } from '@/shared/ui/Typography';
 import { WeatherMiniCard } from '@/entities/weather/ui/WeatherMiniCard';
 import { Spinner } from '@/shared/ui/Spinner';
 import { Toast } from '@/shared/ui/Toaster';
+import {Typography} from "@/shared/ui/Typography";
 
 export default function FavoritesPage() {
   const {
@@ -15,38 +14,51 @@ export default function FavoritesPage() {
     temperatureUnit,
     isLoading,
     error,
-    updateFavoriteWeather,
+    fetchCityWeather,
     setLoading,
     setError,
+    setFavoriteCities,
+    setCurrentCity,
   } = useWeatherStore();
 
   const isInitialMount = useRef(true);
 
   useEffect(() => {
+    if (isInitialMount.current) {
+      const storedFavorites = loadFavorites();
+      setFavoriteCities(storedFavorites);
+      if (storedFavorites.length > 0) {
+        setCurrentCity(storedFavorites[0].name);
+      }
+      isInitialMount.current = false;
+    }
+
     const updateFavoritesWeather = async () => {
       try {
-        setLoading(true);
-        setError(null);
         await Promise.all(
-          favoriteCities.map((city) => updateFavoriteWeather(city.name))
+          favoriteCities.map((city) => fetchCityWeather(city.name, false))
         );
       } catch (err) {
         setError('Failed to update weather data');
       } finally {
-        setLoading(false);
       }
     };
 
-    if (isInitialMount.current || favoriteCities.length > 0) {
+    if (favoriteCities.length > 0) {
       updateFavoritesWeather();
-      isInitialMount.current = false;
     }
-  }, [favoriteCities.length]);
-
+  }, [
+    favoriteCities.length,
+    fetchCityWeather,
+    setLoading,
+    setError,
+    setFavoriteCities,
+    setCurrentCity,
+    temperatureUnit
+  ]);
   return (
     <div className="container mt-5">
       <PageHeader title="Favorites" />
-
       {error && <Toast message={error} />}
       <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
         {favoriteCities.map((city) => (
@@ -54,8 +66,15 @@ export default function FavoritesPage() {
             <WeatherMiniCard city={city} temperatureUnit={temperatureUnit} />
           </div>
         ))}
+        {!isLoading && favoriteCities.length === 0 && (
+            <Typography>No favorite cities, add via forecast page or current city on home page</Typography>
+        )}
       </div>
-      {isLoading && <Spinner />}
+      {isLoading && (
+        <div className="mt-4">
+          <Spinner />
+        </div>
+      )}
     </div>
   );
 }

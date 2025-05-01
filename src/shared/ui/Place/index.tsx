@@ -2,7 +2,7 @@
 
 import s from './Place.module.scss';
 import { getUserCity } from '@/shared/lib/getUserCity';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useWeatherStore } from '@/entities/weather/model/store';
 
 export const Place = () => {
@@ -16,7 +16,7 @@ export const Place = () => {
         setIsLoading(true);
         const userCity = await getUserCity();
         if (userCity === null) {
-          setError('Please enable location access to see your city');
+          setError('Please enable location access');
         } else {
           setCurrentCity(userCity);
         }

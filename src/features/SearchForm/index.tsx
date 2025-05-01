@@ -6,16 +6,16 @@ import { useWeatherStore } from '@/entities/weather/model/store';
 
 export const SearchForm = () => {
   const router = useRouter();
-  const { searchCity, searchFormError, setSearchCity, setSearchFormError } =
+  const { searchCity, error, setSearchCity, setError } =
     useWeatherStore();
 
   const handleSearch = (e: FormEvent) => {
     e.preventDefault();
     if (!searchCity.trim()) {
-      setSearchFormError('Please enter a city name');
+      setError('Please enter a city name');
       return;
     }
-    setSearchFormError(null);
+    setError(null);
     router.push(`/weather/${searchCity}`);
   };
 
@@ -28,7 +28,7 @@ export const SearchForm = () => {
             onChange={(e) => setSearchCity(e.target.value)}
             placeholder="Enter city name"
             fullWidth
-            error={searchFormError || undefined}
+            error={error || undefined}
           />
         </div>
         <Button type="submit">Search</Button>

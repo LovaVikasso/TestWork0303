@@ -7,7 +7,11 @@ import {
 } from 'react';
 import classNames from 'classnames';
 
-export type ButtonVariant = 'primary' | 'secondary' | "outlined" | "outline-primary";
+export type ButtonVariant =
+  | 'primary'
+  | 'secondary'
+  | 'outlined'
+  | 'outline-primary';
 
 type InferType<T> = T extends ElementType<infer U> ? U : never;
 
@@ -47,7 +51,6 @@ const Button = <T extends ElementType = 'button'>(
   );
 };
 
-/** Accepts all props of the native button element. */
 export default Button as <T extends ElementType = 'button'>(
   props: ButtonProps<T> & {
     ref?: ForwardedRef<ComponentRef<T>>;

@@ -60,7 +60,6 @@ export const fetchWeatherByCoords = async (
         units,
       },
     });
-    console.log(response.data, 'coordinates fetch');
     return response.data;
   } catch (error) {
     console.error('Error fetching weather by coordinates:', error);

@@ -1,3 +1,5 @@
+import Image from 'next/image';
+
 type Props = {
   icon: string;
   description: string;
@@ -6,15 +8,18 @@ type Props = {
 
 export const WeatherIcon = ({ icon, description, size = 'md' }: Props) => {
   const sizeMap = {
-    sm: '1x',
-    md: '2x',
-    lg: '4x',
+    sm: 24,
+    md: 48,
+    lg: 96,
   };
 
   return (
-    <img
-      src={`https://openweathermap.org/img/wn/${icon}@${sizeMap[size]}.png`}
+    <Image
+      src={`https://openweathermap.org/img/wn/${icon}@2x.png`}
       alt={description}
+      width={sizeMap[size]}
+      height={sizeMap[size]}
+      unoptimized
     />
   );
 };

@@ -20,7 +20,7 @@ export const WeatherCard = ({ weather, temperatureUnit }: Props) => {
           <Typography as="h3" className="card-title mb-0">
             {weather.name}, {weather.sys.country}
           </Typography>
-          <FavoriteButton city={weather.name} />
+          <FavoriteButton city={weather.name} page="favorite" />
         </div>
         <div className="d-flex align-items-center mb-3">
           <WeatherIcon

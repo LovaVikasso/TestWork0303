@@ -28,22 +28,20 @@ export default function WeatherPage({ params }: Props) {
   } = useWeatherStore();
 
   useEffect(() => {
-    if (currentWeather?.name?.toLowerCase() !== city.toLowerCase()) {
+    if (city) {
       fetchCityWeather(city);
     }
-  }, [city, fetchCityWeather, currentWeather?.name]);
+  }, [city]);
 
   const dailyForecasts = forecast?.filter((item) => {
     const date = new Date(item.dt_txt);
     return date.getHours() === 12;
   });
-
   return (
     <div className="container mt-5">
       <PageHeader title="Weather forecast" />
       <SearchForm />
       {isLoading && <Spinner />}
-      {error && <Toast message={error} />}
       {!isLoading && currentWeather && (
         <div className="row g-4">
           <div className="col-12 col-lg-6">
@@ -75,6 +73,7 @@ export default function WeatherPage({ params }: Props) {
           </div>
         </div>
       )}
+      {error && <Toast message={error} />}
     </div>
   );
 }
